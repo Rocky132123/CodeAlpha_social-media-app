@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'users',
 
     "rest_framework",
     "rest_framework_simplejwt",
@@ -133,3 +134,4 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION":
     True,
 }
+AUTH_USER_MODEL = "users.User"
