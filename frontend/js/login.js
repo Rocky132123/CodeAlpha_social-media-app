@@ -52,9 +52,8 @@ loginForm.addEventListener(
                 data.refresh
             );
 
-            alert(
-    "Login Successful"
-);
+           window.location.href =
+"feed.html";
 
         }
 
