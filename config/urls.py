@@ -18,6 +18,11 @@ urlpatterns = [
         "api/users/",
         include("users.urls")
     ),
+    
+    path(
+    "api/posts/",
+    include("posts.urls")
+),
 ]
 
 if settings.DEBUG:
