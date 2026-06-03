@@ -3,16 +3,11 @@ from rest_framework import serializers
 from .models import User
 
 
-class RegisterSerializer(
-    serializers.ModelSerializer
-):
+class RegisterSerializer(serializers.ModelSerializer):
 
-    password = serializers.CharField(
-        write_only=True
-    )
+    password = serializers.CharField(write_only=True)
 
     class Meta:
-
         model = User
 
         fields = [
@@ -22,10 +17,7 @@ class RegisterSerializer(
             "password",
         ]
 
-    def create(
-        self,
-        validated_data
-    ):
+    def create(self, validated_data):
 
         user = User.objects.create_user(
             username=validated_data["username"],
@@ -34,3 +26,29 @@ class RegisterSerializer(
         )
 
         return user
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+
+        fields = [
+            "id",
+            "username",
+            "email",
+            "bio",
+            "profile_picture",
+            "created_at"
+        ]
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+
+        fields = [
+            "bio",
+            "profile_picture"
+        ]
