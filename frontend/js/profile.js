@@ -9,30 +9,93 @@ if(!accessToken){
     "login.html";
 }
 
-const logoutBtn =
+const usernameEl =
 document.getElementById(
-    "logoutBtn"
+    "username"
 );
 
-logoutBtn.addEventListener(
-    "click",
-    ()=>{
-
-        localStorage.clear();
-
-        window.location.href =
-        "login.html";
-    }
+const emailEl =
+document.getElementById(
+    "email"
 );
+
+const bioEl =
+document.getElementById(
+    "bio"
+);
+
+const messageEl =
+document.getElementById(
+    "message"
+);
+
+const followersCountEl =
+document.getElementById(
+    "followersCount"
+);
+
+const followingCountEl =
+document.getElementById(
+    "followingCount"
+);
+
+const followBtn =
+document.getElementById(
+    "followBtn"
+);
+
+let currentUserId = null;
+
+
 
 async function loadProfile(){
 
-    try{
+    const response =
+    await fetch(
+        `${API_BASE_URL}/users/me/`,
+        {
+            headers:{
+                Authorization:
+                `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const user =
+    await response.json();
+
+    currentUserId =
+    user.id;
+
+    usernameEl.innerText =
+    user.username;
+
+    emailEl.innerText =
+    user.email;
+
+    bioEl.value =
+    user.bio || "";
+
+    followersCountEl.innerText =
+    user.followers_count || 0;
+
+    followingCountEl.innerText =
+    user.following_count || 0;
+}
+
+
+
+followBtn.addEventListener(
+    "click",
+    async ()=>{
 
         const response =
         await fetch(
-            `${API_BASE_URL}/users/me/`,
+            `${API_BASE_URL}/users/follow/${currentUserId}/`,
             {
+
+                method:"POST",
+
                 headers:{
                     Authorization:
                     `Bearer ${accessToken}`
@@ -40,42 +103,23 @@ async function loadProfile(){
             }
         );
 
-        const user =
-        await response.json();
+        if(response.ok){
 
-        document.getElementById(
-            "username"
-        ).innerText =
-        user.username;
+            followBtn.innerText =
+            "Following";
 
-        document.getElementById(
-            "email"
-        ).innerText =
-        user.email;
-
-        document.getElementById(
-            "bio"
-        ).value =
-        user.bio || "";
-
+            loadProfile();
+        }
     }
+);
 
-    catch(error){
 
-        console.log(error);
-    }
-}
 
 document.getElementById(
     "saveBtn"
 ).addEventListener(
     "click",
     async ()=>{
-
-        const bio =
-        document.getElementById(
-            "bio"
-        ).value;
 
         const response =
         await fetch(
@@ -94,28 +138,49 @@ document.getElementById(
                 },
 
                 body:JSON.stringify({
-                    bio
+
+                    bio:
+                    bioEl.value
                 })
             }
         );
 
         if(response.ok){
 
-            document.getElementById(
-                "message"
-            ).innerText =
-            "Profile Updated Successfully";
-
-        }
-
-        else{
-
-            document.getElementById(
-                "message"
-            ).innerText =
-            "Update Failed";
+            messageEl.innerText =
+            "Profile Updated";
         }
     }
 );
+
+
+
+document.getElementById(
+    "backBtn"
+).addEventListener(
+    "click",
+    ()=>{
+
+        window.location.href =
+        "feed.html";
+    }
+);
+
+
+
+document.getElementById(
+    "logoutBtn"
+).addEventListener(
+    "click",
+    ()=>{
+
+        localStorage.clear();
+
+        window.location.href =
+        "login.html";
+    }
+);
+
+
 
 loadProfile();

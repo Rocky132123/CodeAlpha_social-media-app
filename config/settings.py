@@ -10,7 +10,8 @@ SECRET_KEY = config("SECRET_KEY")
 
 DEBUG = config("DEBUG", cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ "127.0.0.1",
+    "localhost",]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -142,11 +143,12 @@ AUTH_USER_MODEL = "users.User"
 CORS_ALLOWED_ORIGINS = [
 
     "http://localhost:5500",
+    "http://127.0.0.1:5500",
 
 ]
-from datetime import timedelta
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }

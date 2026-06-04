@@ -1,117 +1,177 @@
-document.getElementById(
-    "profileBtn"
-).addEventListener(
-    "click",
-    ()=>{
-
-        window.location.href =
-        "profile.html";
-    }
-);
+alert("LATEST FEED JS");
 const accessToken =
-localStorage.getItem(
-    "access"
-);
+localStorage.getItem("access");
 
-if(!accessToken){
-
+if (!accessToken) {
     window.location.href =
     "login.html";
 }
 
 const postsContainer =
-document.getElementById(
-    "postsContainer"
-);
+document.getElementById("postsContainer");
 
 const createPostBtn =
-document.getElementById(
-    "createPostBtn"
-);
+document.getElementById("createPostBtn");
 
 const logoutBtn =
-document.getElementById(
-    "logoutBtn"
-);
+document.getElementById("logoutBtn");
 
+
+console.log("postsContainer =", postsContainer);
+console.log("createPostBtn =", createPostBtn);
+console.log("logoutBtn =", logoutBtn);
+
+if(!logoutBtn){
+    alert("logoutBtn is NULL");
+}
+
+if(!createPostBtn){
+    alert("createPostBtn is NULL");
+}
+
+if(!postsContainer){
+    alert("postsContainer is NULL");
+}
 logoutBtn.addEventListener(
     "click",
-    ()=>{
+    () => {
 
         localStorage.clear();
 
         window.location.href =
         "login.html";
+
+    }
+);
+const profileBtn =
+document.getElementById(
+    "profileBtn"
+);
+
+profileBtn.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+        "profile.html";
+
     }
 );
 
-async function loadPosts(){
 
-    try{
+async function loadPosts() {
 
-        const response =
+    postsContainer.innerHTML =
+    "<p>Loading Posts...</p>";
+
+    const response =
+    await fetch(
+        `${API_BASE_URL}/posts/`,
+        {
+            headers: {
+                Authorization:
+                `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const posts =
+    await response.json();
+
+    postsContainer.innerHTML = "";
+
+    for (const post of posts) {
+
+        const commentsResponse =
         await fetch(
-            `${API_BASE_URL}/posts/`
+            `${API_BASE_URL}/comments/post/${post.id}/`
         );
 
-        const posts =
-        await response.json();
+        const comments =
+        await commentsResponse.json();
 
-        postsContainer.innerHTML =
-        "";
+        let commentsHTML = "";
 
-        posts.forEach(post=>{
+        comments.forEach(
+            comment => {
 
-            postsContainer.innerHTML +=
+                commentsHTML += `
 
-            `
+                    <div class="comment">
+
+                        <strong>
+                        ${comment.author_username}
+                        </strong>
+
+                        <p>
+                        ${comment.content}
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+        postsContainer.innerHTML += `
+
             <div class="post-card">
 
-                <div class="username">
-
+                <h3>
                     ${post.author_username}
+                </h3>
 
-                </div>
-
-                <div>
-
+                <p>
                     ${post.content}
+                </p>
 
-                </div>
+                <small>
+                    ${post.created_at}
+                </small>
 
-                <div class="date">
+                <hr>
 
-                    ${new Date(
-                        post.created_at
-                    ).toLocaleString()}
+                <h4>
+                    Comments
+                </h4>
 
-                </div>
+                ${commentsHTML}
+
+                <textarea
+                    id="comment-${post.id}"
+                    placeholder="Write a comment..."
+                ></textarea>
+
+                <button
+                    onclick="addComment(${post.id})"
+                >
+                    Add Comment
+                </button>
 
             </div>
-            `;
-        });
 
-    }
-
-    catch(error){
-
-        console.log(error);
+        `;
     }
 }
 
+
+
 createPostBtn.addEventListener(
     "click",
-    async ()=>{
+    async () => {
 
         const content =
-        document.getElementById(
+        document
+        .getElementById(
             "postContent"
-        ).value;
+        )
+        .value;
 
-        if(!content){
+        if (!content) {
 
             alert(
-                "Post content required"
+                "Post cannot be empty"
             );
 
             return;
@@ -121,47 +181,88 @@ createPostBtn.addEventListener(
         await fetch(
             `${API_BASE_URL}/posts/create/`,
             {
+                method: "POST",
 
-                method:"POST",
-
-                headers:{
+                headers: {
 
                     "Content-Type":
                     "application/json",
 
-                    "Authorization":
+                    Authorization:
                     `Bearer ${accessToken}`
                 },
 
-                body:JSON.stringify({
-
+                body: JSON.stringify({
                     content
                 })
             }
         );
 
-        if(response.ok){
+        if (response.ok) {
 
-            document.getElementById(
+            document
+            .getElementById(
                 "postContent"
-            ).value =
-            "";
+            )
+            .value = "";
 
             loadPosts();
         }
-
-        else{
-
-            const error =
-            await response.json();
-
-            console.log(error);
-
-            alert(
-                "Post creation failed"
-            );
-        }
     }
 );
+
+
+
+async function addComment(
+    postId
+) {
+
+    const commentContent =
+    document.getElementById(
+        `comment-${postId}`
+    ).value;
+
+    if (!commentContent) {
+
+        alert(
+            "Comment cannot be empty"
+        );
+
+        return;
+    }
+
+    const response =
+    await fetch(
+        `${API_BASE_URL}/comments/create/`,
+        {
+            method: "POST",
+
+            headers: {
+
+                "Content-Type":
+                "application/json",
+
+                Authorization:
+                `Bearer ${accessToken}`
+            },
+
+            body: JSON.stringify({
+
+                post: postId,
+
+                content:
+                commentContent
+
+            })
+        }
+    );
+
+    if (response.ok) {
+
+        loadPosts();
+    }
+}
+
+
 
 loadPosts();

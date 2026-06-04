@@ -1,11 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Profile</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/theme.css">
 
     <link
         rel="stylesheet"
@@ -15,50 +23,90 @@
 
 <body>
 
-<nav>
-
-    <h2>My Profile</h2>
-
-    <button id="logoutBtn">
-        Logout
-    </button>
-
-</nav>
-
 <div class="container">
+
+    <h1>
+        ☕ My Profile
+    </h1>
 
     <div class="profile-card">
 
-        <h2 id="username">
-            Loading...
-        </h2>
+    <h2 id="username">
+        Loading...
+    </h2>
 
-        <p id="email"></p>
+    <p id="email"></p>
 
-        <label>
+    <div class="stats">
 
-            Bio
+        <div class="stat-box">
 
-        </label>
+            <h3 id="followersCount">
+                0
+            </h3>
 
-        <textarea
-            id="bio">
-        </textarea>
+            <p>
+                Followers
+            </p>
 
-        <button id="saveBtn">
+        </div>
 
-            Save Profile
+        <div class="stat-box">
 
-        </button>
+            <h3 id="followingCount">
+                0
+            </h3>
 
-        <p id="message"></p>
+            <p>
+                Following
+            </p>
+
+        </div>
 
     </div>
+
+    <button id="followBtn">
+
+        Follow
+
+    </button>
+
+    <label>
+
+        Bio
+
+    </label>
+
+    <textarea
+        id="bio"
+        placeholder="Write your bio..."
+    ></textarea>
+
+    <button id="saveBtn">
+
+        Save Profile
+
+    </button>
+
+    <button id="backBtn">
+
+        Back To Feed
+
+    </button>
+
+    <button id="logoutBtn">
+
+        Logout
+
+    </button>
+
+    <p id="message"></p>
+
+</div>
 
 </div>
 
 <script src="../js/config.js"></script>
-
 <script src="../js/profile.js"></script>
 
 </body>

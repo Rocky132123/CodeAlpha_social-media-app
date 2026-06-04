@@ -1,10 +1,12 @@
-from django.urls import path
+from django.urls import path 
 
 from .views import (
     RegisterView,
     CurrentUserView,
     UpdateProfileView,
-    UserProfileView
+    UserProfileView,
+    FollowUserView,
+    UnfollowUserView
 )
 
 from rest_framework_simplejwt.views import (
@@ -49,4 +51,16 @@ urlpatterns = [
         UserProfileView.as_view(),
         name="user-profile"
     ),
+    path(
+    "follow/<int:id>/",
+    FollowUserView.as_view(),
+    name="follow-user"
+),
+
+path(
+    "unfollow/<int:id>/",
+    UnfollowUserView.as_view(),
+    name="unfollow-user"
+),
+
 ]
