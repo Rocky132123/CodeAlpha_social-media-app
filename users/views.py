@@ -40,128 +40,88 @@ class UpdateProfileView(generics.UpdateAPIView):
     def get_object(self):
         return self.request.user
 
-
-class UserProfileView(generics.RetrieveAPIView):
+class UserProfileView(
+    generics.RetrieveAPIView
+):
 
     queryset = User.objects.all()
 
-    serializer_class = UserProfileSerializer
+    serializer_class = (
+        UserProfileSerializer
+    )
 
     lookup_field = "id"
 
-class FollowUserView(
-    APIView
-):
-
     permission_classes = [
         IsAuthenticated
     ]
 
-    def post(
-        self,
-        request,
-        id
+    def get_serializer_context(
+        self
     ):
 
-        target_user =User.objects.get(
-            id=id
+        context = super(
+        ).get_serializer_context()
+
+        context["request"] = (
+            self.request
         )
 
-        target_user.followers.add(
-            request.user
-        )
+        return context
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+from .models import User
+
+
+class FollowUserView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, id):
+
+        target_user = User.objects.get(id=id)
+
+        if target_user == request.user:
+
+            return Response(
+                {
+                    "error": "Cannot follow yourself"
+                },
+                status=400
+            )
+
+        target_user.followers.add(request.user)
 
         return Response(
             {
-                "message":
-                "Followed Successfully"
+                "message": "Followed Successfully"
             }
         )
 
 
-class UnfollowUserView(
-    APIView
-):
+class UnfollowUserView(APIView):
 
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
-    def post(
-        self,
-        request,
-        id
-    ):
+    def post(self, request, id):
 
-        target_user =User.objects.get(
-            id=id
-        )
+        target_user = User.objects.get(id=id)
 
-        target_user.followers.remove(
-            request.user
-        )
+        if target_user == request.user:
+
+            return Response(
+                {
+                    "error": "Cannot unfollow yourself"
+                },
+                status=400
+            )
+
+        target_user.followers.remove(request.user)
 
         return Response(
             {
-                "message":
-                "Unfollowed Successfully"
-            }
-        )
-class FollowUserView(
-    APIView
-):
-
-    permission_classes = [
-        IsAuthenticated
-    ]
-
-    def post(
-        self,
-        request,
-        id
-    ):
-
-        target_user =User.objects.get(
-            id=id
-        )
-
-        target_user.followers.add(
-            request.user
-        )
-
-        return Response(
-            {
-                "message":
-                "Followed Successfully"
-            }
-        )
-
-
-class UnfollowUserView(
-    APIView
-):
-
-    permission_classes = [
-        IsAuthenticated
-    ]
-
-    def post(
-        self,
-        request,
-        id
-    ):
-
-        target_user =User.objects.get(
-            id=id
-        )
-
-        target_user.followers.remove(
-            request.user
-        )
-
-        return Response(
-            {
-                "message":
-                "Unfollowed Successfully"
+                "message": "Unfollowed Successfully"
             }
         )

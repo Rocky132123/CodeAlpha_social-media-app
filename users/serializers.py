@@ -28,13 +28,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserProfileSerializer(
-    serializers.ModelSerializer
-):
+from rest_framework import serializers
+from .models import User
 
-    followers_count =serializers.SerializerMethodField()
 
-    following_count =serializers.SerializerMethodField()
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    followers_count = serializers.SerializerMethodField()
+
+    following_count = serializers.SerializerMethodField()
+
+    is_following = serializers.SerializerMethodField()
 
     class Meta:
 
@@ -58,6 +62,7 @@ class UserProfileSerializer(
 
             "following_count",
 
+            "is_following",
         ]
 
     def get_followers_count(
@@ -72,6 +77,25 @@ class UserProfileSerializer(
     ):
         return obj.following.count()
 
+    def get_is_following(
+        self,
+        obj
+    ):
+
+        request = self.context.get(
+            "request"
+        )
+
+        if (
+            request and
+            request.user.is_authenticated
+        ):
+
+            return obj.followers.filter(
+                id=request.user.id
+            ).exists()
+
+        return False
 class UpdateProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
