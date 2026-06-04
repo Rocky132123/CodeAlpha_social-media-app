@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'users',
     'posts',
     "corsheaders",
+    "comments",
 
     "rest_framework",
     "rest_framework_simplejwt",
@@ -143,3 +144,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5500",
 
 ]
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
