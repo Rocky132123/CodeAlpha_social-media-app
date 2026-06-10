@@ -12,13 +12,15 @@ from .models import Comment
 from .serializers import (
     CommentSerializer
 )
-
+from notifications.models import Notification
 
 class CreateCommentView(
     generics.CreateAPIView
 ):
 
-    serializer_class = CommentSerializer
+    serializer_class = (
+        CommentSerializer
+    )
 
     permission_classes = [
         IsAuthenticated
@@ -29,11 +31,29 @@ class CreateCommentView(
         serializer
     ):
 
-        serializer.save(
+        comment = serializer.save(
             author=self.request.user
         )
 
+        if (
+            comment.post.author !=
+            self.request.user
+        ):
 
+            Notification.objects.create(
+
+                recipient=
+                comment.post.author,
+
+                sender=
+                self.request.user,
+
+                notification_type=
+                "comment",
+
+                message=
+                f"{self.request.user.username} commented on your post"
+            )
 class PostCommentsView(
     generics.ListAPIView
 ):

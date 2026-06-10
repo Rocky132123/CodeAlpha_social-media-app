@@ -20,6 +20,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Post
 from .serializers import PostSerializer
 
+from notifications.models import Notification
 
 class PostListView(
     generics.ListAPIView
@@ -133,6 +134,20 @@ class LikePostView(
         post.likes.add(
             request.user
         )
+
+        if post.author != request.user:
+
+            Notification.objects.create(
+
+                recipient=post.author,
+
+                sender=request.user,
+
+                notification_type="like",
+
+                message=
+                f"{request.user.username} liked your post"
+            )
 
         return Response(
             {

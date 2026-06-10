@@ -29,6 +29,12 @@ path(
         "comments.urls"
     )
 ),
+path(
+    "api/notifications/",
+    include(
+        "notifications.urls"
+    )
+),
 ]
 
 if settings.DEBUG:

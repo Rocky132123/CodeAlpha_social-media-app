@@ -6,6 +6,8 @@ from .models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q
+
+from notifications.models import Notification
 from .serializers import (
     RegisterSerializer,
     UserProfileSerializer,
@@ -78,6 +80,10 @@ from .models import User
 
 
 class FollowUserView(APIView):
+    from notifications.models import (
+    Notification
+)
+   
 
     permission_classes = [IsAuthenticated]
 
@@ -95,6 +101,20 @@ class FollowUserView(APIView):
             )
 
         target_user.followers.add(request.user)
+
+        Notification.objects.create(
+                recipient=target_user,
+
+                sender=request.user,
+
+                notification_type="follow",
+
+                message=
+                f"{request.user.username} followed you"
+            )
+
+        
+        
 
         return Response(
             {

@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'posts',
     "corsheaders",
     "comments",
+    "notifications",
 
     "rest_framework",
     "rest_framework_simplejwt",
