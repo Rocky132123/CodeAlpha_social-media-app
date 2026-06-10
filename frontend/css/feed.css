@@ -213,3 +213,42 @@ hr{
 
     border-radius:6px;
 }
+.feed-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+}
+
+.empty-feed{
+
+    text-align:center;
+
+    padding:30px;
+
+    background:white;
+
+    border-radius:10px;
+}
+
+.suggestions-card{
+
+    background:white;
+
+    padding:20px;
+
+    margin-bottom:20px;
+
+    border-radius:10px;
+}
+
+.suggestion{
+
+    padding:10px;
+
+    border-bottom:1px solid #eee;
+}

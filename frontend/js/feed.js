@@ -71,7 +71,19 @@ profileBtn.addEventListener(
 
     }
 );
+const refreshFeedBtn =
+document.getElementById(
+    "refreshFeedBtn"
+);
 
+refreshFeedBtn.addEventListener(
+    "click",
+    loadPosts
+);
+const suggestedUsers =
+document.getElementById(
+    "suggestedUsers"
+);
 
 async function loadPosts() {
 
@@ -91,7 +103,27 @@ async function loadPosts() {
 
   const posts =
 await response.json();
+if(posts.length === 0){
 
+    postsContainer.innerHTML = `
+
+        <div class="empty-feed">
+
+            <h3>
+                No Posts Yet
+            </h3>
+
+            <p>
+                Follow users to see
+                their posts.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+}
 console.table(posts);
     postsContainer.innerHTML = "";
 
@@ -387,4 +419,43 @@ searchBtn.addEventListener(
     "click",
     searchUsers
 );
+async function loadSuggestions(){
+
+    const response =
+    await fetch(
+        `${API_BASE_URL}/users/search/?q=`,
+        {
+            headers:{
+                Authorization:
+                `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const users =
+    await response.json();
+
+    suggestedUsers.innerHTML = "";
+
+    users.slice(0,5).forEach(
+        user => {
+
+            suggestedUsers.innerHTML += `
+
+                <div class="suggestion">
+
+                    <a
+                        href="profile.html?id=${user.id}"
+                    >
+                        ${user.username}
+                    </a>
+
+                </div>
+
+            `;
+        }
+    );
+}
 loadPosts();
+
+loadSuggestions();
