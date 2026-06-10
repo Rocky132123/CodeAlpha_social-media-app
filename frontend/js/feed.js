@@ -47,6 +47,20 @@ const profileBtn =
 document.getElementById(
     "profileBtn"
 );
+const searchBtn =
+document.getElementById(
+    "searchBtn"
+);
+
+const searchInput =
+document.getElementById(
+    "searchInput"
+);
+
+const searchResults =
+document.getElementById(
+    "searchResults"
+);
 
 profileBtn.addEventListener(
     "click",
@@ -315,5 +329,62 @@ async function likePost(
         );
     }
 }
+async function searchUsers() {
 
+    const query =
+    searchInput.value;
+
+    if(!query){
+
+        return;
+    }
+
+    const response =
+    await fetch(
+        `${API_BASE_URL}/users/search/?q=${query}`,
+        {
+            headers:{
+                Authorization:
+                `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const users =
+    await response.json();
+
+    searchResults.innerHTML =
+    "";
+
+    users.forEach(
+        user => {
+
+            searchResults.innerHTML += `
+
+                <div
+                    class="search-result"
+                >
+
+                    <strong>
+                        ${user.username}
+                    </strong>
+
+                    <br>
+
+                    <a
+                        href="profile.html?id=${user.id}"
+                    >
+                        View Profile
+                    </a>
+
+                </div>
+
+            `;
+        }
+    );
+}
+searchBtn.addEventListener(
+    "click",
+    searchUsers
+);
 loadPosts();
