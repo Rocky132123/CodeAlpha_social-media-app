@@ -105,3 +105,16 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             "bio",
             "profile_picture"
         ]
+class UserSearchSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = User
+
+        fields = [
+            "id",
+            "username",
+            "profile_picture"
+        ]

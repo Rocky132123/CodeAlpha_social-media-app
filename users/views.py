@@ -5,11 +5,13 @@ from rest_framework.response import Response
 from .models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
+from django.db.models import Q
 from .serializers import (
     RegisterSerializer,
     UserProfileSerializer,
-    UpdateProfileSerializer
+    UpdateProfileSerializer,
+    UserSearchSerializer
+
 )
 
 
@@ -124,4 +126,32 @@ class UnfollowUserView(APIView):
             {
                 "message": "Unfollowed Successfully"
             }
+        )
+class UserSearchView(
+    generics.ListAPIView
+):
+
+    serializer_class = (
+        UserSearchSerializer
+    )
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        query = self.request.GET.get(
+            "q",
+            ""
+        )
+
+        return User.objects.filter(
+
+            Q(username__icontains=query)
+
+        ).exclude(
+
+            id=self.request.user.id
+
         )

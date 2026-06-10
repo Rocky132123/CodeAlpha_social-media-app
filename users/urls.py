@@ -6,7 +6,8 @@ from .views import (
     UpdateProfileView,
     UserProfileView,
     FollowUserView,
-    UnfollowUserView
+    UnfollowUserView,
+    UserSearchView
 )
 
 from rest_framework_simplejwt.views import (
@@ -62,5 +63,9 @@ path(
     UnfollowUserView.as_view(),
     name="unfollow-user"
 ),
-
+path(
+    "search/",
+    UserSearchView.as_view(),
+    name="user-search"
+),
 ]
