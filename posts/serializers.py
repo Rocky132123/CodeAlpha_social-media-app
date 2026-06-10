@@ -19,19 +19,13 @@ class PostSerializer(
         model = Post
 
         fields = [
-
             "id",
-
             "author",
-
             "author_username",
-
             "content",
-
+            "image",
             "likes_count",
-
             "created_at",
-
             "updated_at"
         ]
 

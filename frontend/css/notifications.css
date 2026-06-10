@@ -1,0 +1,30 @@
+.container{
+
+    width:80%;
+
+    margin:auto;
+
+    padding:20px;
+}
+
+.notification-card{
+
+    background:white;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+    border-radius:10px;
+
+    box-shadow:0 2px 8px rgba(
+        0,0,0,0.1
+    );
+}
+
+.notification-time{
+
+    color:gray;
+
+    font-size:12px;
+}

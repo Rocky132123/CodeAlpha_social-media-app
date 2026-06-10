@@ -84,6 +84,19 @@ const suggestedUsers =
 document.getElementById(
     "suggestedUsers"
 );
+const notificationsBtn =
+document.getElementById(
+    "notificationsBtn"
+);
+
+notificationsBtn.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+        "notifications.html";
+    }
+);
 
 async function loadPosts() {
 
