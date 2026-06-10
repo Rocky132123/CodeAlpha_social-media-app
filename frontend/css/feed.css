@@ -175,3 +175,11 @@ hr{
 
     text-decoration:underline;
 }
+.likes-count{
+
+    margin-top:10px;
+
+    font-weight:bold;
+
+    color:#A67C52;
+}

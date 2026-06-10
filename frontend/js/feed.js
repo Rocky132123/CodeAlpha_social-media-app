@@ -130,14 +130,23 @@ console.table(posts);
     </a>
 
 </h3>
-                <p>
-                    ${post.content}
-                </p>
+              <p>
+    ${post.content}
+</p>
 
-                <small>
-                    ${post.created_at}
-                </small>
+<p class="likes-count">
+    ❤️ ${post.likes_count || 0} Likes
+</p>
 
+<button
+    onclick="likePost(${post.id})"
+>
+    ❤️ Like
+</button>
+
+<small>
+    ${post.created_at}
+</small>
                 <hr>
 
                 <h4>
@@ -271,6 +280,40 @@ async function addComment(
     }
 }
 
+async function likePost(
+    postId
+) {
 
+    const response =
+    await fetch(
+        `${API_BASE_URL}/posts/like/${postId}/`,
+        {
+            method: "POST",
+
+            headers: {
+                Authorization:
+                `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const data =
+    await response.json();
+
+    console.log(data);
+
+    if(response.ok){
+
+        loadPosts();
+
+    }
+    else{
+
+        alert(
+            data.error ||
+            "Unable to Like Post"
+        );
+    }
+}
 
 loadPosts();
