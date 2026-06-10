@@ -75,9 +75,10 @@ async function loadPosts() {
         }
     );
 
-    const posts =
-    await response.json();
+  const posts =
+await response.json();
 
+console.table(posts);
     postsContainer.innerHTML = "";
 
     for (const post of posts) {
@@ -117,11 +118,18 @@ async function loadPosts() {
         postsContainer.innerHTML += `
 
             <div class="post-card">
+<h3>
 
-                <h3>
-                    ${post.author_username}
-                </h3>
+    <a
+        href="profile.html?id=${post.author}"
+        class="profile-link"
+    >
 
+        ${post.author_username}
+
+    </a>
+
+</h3>
                 <p>
                     ${post.content}
                 </p>

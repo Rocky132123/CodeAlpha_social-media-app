@@ -5,7 +5,9 @@ from .views import (
     PostDetailView,
     CreatePostView,
     UserPostsView,
-    DeletePostView
+    DeletePostView,
+    LikePostView,
+    UnlikePostView
 )
 
 urlpatterns = [
@@ -39,4 +41,15 @@ urlpatterns = [
         DeletePostView.as_view(),
         name="delete-post"
     ),
+    path(
+    "like/<int:id>/",
+    LikePostView.as_view(),
+    name="like-post"
+),
+
+path(
+    "unlike/<int:id>/",
+    UnlikePostView.as_view(),
+    name="unlike-post"
+),
 ]

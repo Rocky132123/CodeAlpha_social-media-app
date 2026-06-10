@@ -2,7 +2,9 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import generics
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import (
     IsAuthenticated,
     IsAuthenticatedOrReadOnly
@@ -80,4 +82,60 @@ class DeletePostView(
 
         return Post.objects.filter(
             author=self.request.user
+        )
+class LikePostView(
+    APIView
+):
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def post(
+        self,
+        request,
+        id
+    ):
+
+        post = Post.objects.get(
+            id=id
+        )
+
+        post.likes.add(
+            request.user
+        )
+
+        return Response(
+            {
+                "message":
+                "Post Liked"
+            }
+        )
+class UnlikePostView(
+    APIView
+):
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def post(
+        self,
+        request,
+        id
+    ):
+
+        post = Post.objects.get(
+            id=id
+        )
+
+        post.likes.remove(
+            request.user
+        )
+
+        return Response(
+            {
+                "message":
+                "Post Unliked"
+            }
         )

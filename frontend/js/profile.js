@@ -1,60 +1,91 @@
 const accessToken =
-localStorage.getItem(
-    "access"
-);
+localStorage.getItem("access");
 
-if(!accessToken){
+if (!accessToken) {
 
     window.location.href =
     "login.html";
 }
 
 const usernameEl =
-document.getElementById(
-    "username"
-);
+document.getElementById("username");
 
 const emailEl =
-document.getElementById(
-    "email"
-);
+document.getElementById("email");
 
 const bioEl =
-document.getElementById(
-    "bio"
-);
+document.getElementById("bio");
 
 const messageEl =
-document.getElementById(
-    "message"
-);
+document.getElementById("message");
 
 const followersCountEl =
-document.getElementById(
-    "followersCount"
-);
+document.getElementById("followersCount");
 
 const followingCountEl =
-document.getElementById(
-    "followingCount"
-);
+document.getElementById("followingCount");
 
 const followBtn =
-document.getElementById(
-    "followBtn"
-);
+document.getElementById("followBtn");
+
+const saveBtn =
+document.getElementById("saveBtn");
 
 let currentUserId = null;
+let viewedUserId = null;
 
 
 
-async function loadProfile(){
+async function loadProfile() {
 
-    const response =
+    const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+    viewedUserId =
+    params.get("id");
+
+
+
+    const meResponse =
     await fetch(
         `${API_BASE_URL}/users/me/`,
         {
-            headers:{
+            headers: {
+                Authorization:
+                `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const me =
+    await meResponse.json();
+
+    currentUserId =
+    me.id;
+
+
+
+    const profileUrl =
+
+    viewedUserId
+
+    ?
+
+    `${API_BASE_URL}/users/profile/${viewedUserId}/`
+
+    :
+
+    `${API_BASE_URL}/users/me/`;
+
+
+
+    const profileResponse =
+    await fetch(
+        profileUrl,
+        {
+            headers: {
                 Authorization:
                 `Bearer ${accessToken}`
             }
@@ -62,10 +93,14 @@ async function loadProfile(){
     );
 
     const user =
-    await response.json();
+    await profileResponse.json();
 
-    currentUserId =
-    user.id;
+    console.log(
+        "PROFILE DATA:",
+        user
+    );
+
+
 
     usernameEl.innerText =
     user.username;
@@ -81,54 +116,97 @@ async function loadProfile(){
 
     followingCountEl.innerText =
     user.following_count || 0;
+
+
+
+    if (user.is_following) {
+
+        followBtn.innerText =
+        "Following";
+
+    }
+    else {
+
+        followBtn.innerText =
+        "Follow";
+
+    }
+
+
+
+    if (user.id === currentUserId) {
+
+        followBtn.style.display =
+        "none";
+
+        bioEl.disabled = false;
+
+        saveBtn.style.display =
+        "inline-block";
+    }
+    else {
+
+        followBtn.style.display =
+        "inline-block";
+
+        bioEl.disabled = true;
+
+        saveBtn.style.display =
+        "none";
+    }
 }
 
 
 
 followBtn.addEventListener(
     "click",
-    async ()=>{
+    async () => {
 
         const response =
         await fetch(
-            `${API_BASE_URL}/users/follow/${currentUserId}/`,
+            `${API_BASE_URL}/users/follow/${viewedUserId}/`,
             {
+                method: "POST",
 
-                method:"POST",
-
-                headers:{
+                headers: {
                     Authorization:
                     `Bearer ${accessToken}`
                 }
             }
         );
 
-        if(response.ok){
+        const data =
+        await response.json();
 
-            followBtn.innerText =
-            "Following";
+        if (response.ok) {
+
+            console.log(data);
 
             loadProfile();
+        }
+        else {
+
+            alert(
+                data.error ||
+                "Follow failed"
+            );
         }
     }
 );
 
 
 
-document.getElementById(
-    "saveBtn"
-).addEventListener(
+saveBtn.addEventListener(
     "click",
-    async ()=>{
+    async () => {
 
         const response =
         await fetch(
             `${API_BASE_URL}/users/me/update/`,
             {
+                method: "PUT",
 
-                method:"PUT",
-
-                headers:{
+                headers: {
 
                     "Content-Type":
                     "application/json",
@@ -137,7 +215,7 @@ document.getElementById(
                     `Bearer ${accessToken}`
                 },
 
-                body:JSON.stringify({
+                body: JSON.stringify({
 
                     bio:
                     bioEl.value
@@ -145,10 +223,15 @@ document.getElementById(
             }
         );
 
-        if(response.ok){
+        if (response.ok) {
 
             messageEl.innerText =
-            "Profile Updated";
+            "Profile Updated Successfully";
+        }
+        else {
+
+            messageEl.innerText =
+            "Update Failed";
         }
     }
 );
@@ -159,7 +242,7 @@ document.getElementById(
     "backBtn"
 ).addEventListener(
     "click",
-    ()=>{
+    () => {
 
         window.location.href =
         "feed.html";
@@ -172,7 +255,7 @@ document.getElementById(
     "logoutBtn"
 ).addEventListener(
     "click",
-    ()=>{
+    () => {
 
         localStorage.clear();
 

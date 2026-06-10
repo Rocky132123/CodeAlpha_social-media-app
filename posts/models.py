@@ -1,6 +1,4 @@
-from django.db import models
 
-# Create your models here.
 from django.db import models
 
 from users.models import User
@@ -13,6 +11,11 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name="posts"
     )
+    likes = models.ManyToManyField(
+    User,
+    related_name="liked_posts",
+    blank=True
+)
 
     content = models.TextField()
 
@@ -20,9 +23,11 @@ class Post(models.Model):
         auto_now_add=True
     )
 
+
     updated_at = models.DateTimeField(
         auto_now=True
     )
+    
 
     class Meta:
 
