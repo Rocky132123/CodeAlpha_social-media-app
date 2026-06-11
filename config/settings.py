@@ -148,7 +148,7 @@ AUTH_USER_MODEL = "users.User"
 CORS_ALLOWED_ORIGINS = [
     "https://aloe-frontend.onrender.com",
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True
 print("CORS LOADED")
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
