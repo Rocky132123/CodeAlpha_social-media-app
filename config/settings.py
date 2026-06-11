@@ -10,7 +10,11 @@ SECRET_KEY = config("SECRET_KEY")
 
 DEBUG = config("DEBUG", cast=bool)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "aloe-app.onrender.com",
+    "localhost",
+    "127.0.0.1"
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -143,10 +147,7 @@ SIMPLE_JWT = {
 }
 AUTH_USER_MODEL = "users.User"
 CORS_ALLOWED_ORIGINS = [
-
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-
+    "https://your-frontend.onrender.com",
 ]
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
