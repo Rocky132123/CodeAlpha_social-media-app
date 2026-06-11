@@ -177,22 +177,32 @@ console.table(posts);
         postsContainer.innerHTML += `
 
             <div class="post-card">
-<h3>
+<div class="post-header">
+
+    <img
+        src="${post.author_profile_picture}"
+        class="post-pfp"
+    >
 
     <a
         href="profile.html?id=${post.author}"
         class="profile-link"
     >
-
         ${post.author_username}
-
     </a>
 
-</h3>
+</div>
               <p>
     ${post.content}
 </p>
+<p>${post.content}</p>
 
+${post.image ? `
+<img
+    src="${post.image}"
+    class="post-image"
+>
+` : ""}
 <p class="likes-count">
     ❤️ ${post.likes_count || 0} Likes
 </p>
@@ -238,56 +248,60 @@ createPostBtn.addEventListener(
     async () => {
 
         const content =
-        document
-        .getElementById(
+        document.getElementById(
             "postContent"
-        )
-        .value;
+        ).value;
 
-        if (!content) {
+        const image =
+        document.getElementById(
+            "postImage"
+        ).files[0];
 
-            alert(
-                "Post cannot be empty"
+        const formData =
+        new FormData();
+
+        formData.append(
+            "content",
+            content
+        );
+
+        if(image){
+
+            formData.append(
+                "image",
+                image
             );
-
-            return;
         }
 
         const response =
         await fetch(
             `${API_BASE_URL}/posts/create/`,
             {
-                method: "POST",
+                method:"POST",
 
-                headers: {
-
-                    "Content-Type":
-                    "application/json",
-
+                headers:{
                     Authorization:
                     `Bearer ${accessToken}`
                 },
 
-                body: JSON.stringify({
-                    content
-                })
+                body:formData
             }
         );
 
-        if (response.ok) {
+        if(response.ok){
 
-            document
-            .getElementById(
+            document.getElementById(
                 "postContent"
-            )
-            .value = "";
+            ).value = "";
+
+            document.getElementById(
+                "postImage"
+            ).value = "";
 
             loadPosts();
         }
     }
 );
-
-
 
 async function addComment(
     postId

@@ -15,7 +15,10 @@ from .serializers import (
     UserSearchSerializer
 
 )
-
+from rest_framework.parsers import (
+    MultiPartParser,
+    FormParser
+)
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -33,13 +36,28 @@ class CurrentUserView(generics.RetrieveAPIView):
         return self.request.user
 
 
-class UpdateProfileView(generics.UpdateAPIView):
+from rest_framework.parsers import (
+    MultiPartParser,
+    FormParser
+)
 
-    serializer_class = UpdateProfileSerializer
+class UpdateProfileView(
+    generics.UpdateAPIView
+):
+
+    serializer_class = (
+        UpdateProfileSerializer
+    )
 
     permission_classes = [
         IsAuthenticated
     ]
+
+    parser_classes = [
+        MultiPartParser,
+        FormParser
+    ]
+    
 
     def get_object(self):
         return self.request.user

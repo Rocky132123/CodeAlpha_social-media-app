@@ -1,14 +1,16 @@
 from rest_framework import serializers
-
 from .models import Post
 
 
-class PostSerializer(
-    serializers.ModelSerializer
-):
+class PostSerializer(serializers.ModelSerializer):
 
     author_username = serializers.CharField(
         source="author.username",
+        read_only=True
+    )
+
+    author_profile_picture = serializers.ImageField(
+        source="author.profile_picture",
         read_only=True
     )
 
@@ -22,6 +24,7 @@ class PostSerializer(
             "id",
             "author",
             "author_username",
+            "author_profile_picture",
             "content",
             "image",
             "likes_count",

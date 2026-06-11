@@ -31,9 +31,14 @@ document.getElementById("followBtn");
 const saveBtn =
 document.getElementById("saveBtn");
 
+const profileImage =
+document.getElementById("profileImage");
+
+const profilePicture =
+document.getElementById("profilePicture");
+
 let currentUserId = null;
 let viewedUserId = null;
-
 
 
 async function loadProfile() {
@@ -45,8 +50,6 @@ async function loadProfile() {
 
     viewedUserId =
     params.get("id");
-
-
 
     const meResponse =
     await fetch(
@@ -65,8 +68,6 @@ async function loadProfile() {
     currentUserId =
     me.id;
 
-
-
     const profileUrl =
 
     viewedUserId
@@ -78,8 +79,6 @@ async function loadProfile() {
     :
 
     `${API_BASE_URL}/users/me/`;
-
-
 
     const profileResponse =
     await fetch(
@@ -100,8 +99,6 @@ async function loadProfile() {
         user
     );
 
-
-
     usernameEl.innerText =
     user.username;
 
@@ -117,7 +114,21 @@ async function loadProfile() {
     followingCountEl.innerText =
     user.following_count || 0;
 
+    if (
+        user.profile_picture
+    ) {
 
+        profileImage.src =
+        user.profile_picture;
+
+        profileImage.style.display =
+        "block";
+    }
+    else {
+
+        profileImage.style.display =
+        "none";
+    }
 
     if (user.is_following) {
 
@@ -132,30 +143,38 @@ async function loadProfile() {
 
     }
 
-
-
-    if (user.id === currentUserId) {
+    if (
+        user.id ===
+        currentUserId
+    ) {
 
         followBtn.style.display =
         "none";
 
-        bioEl.disabled = false;
+        bioEl.disabled =
+        false;
 
         saveBtn.style.display =
         "inline-block";
+
+        profilePicture.style.display =
+        "block";
     }
     else {
 
         followBtn.style.display =
         "inline-block";
 
-        bioEl.disabled = true;
+        bioEl.disabled =
+        true;
 
         saveBtn.style.display =
         "none";
+
+        profilePicture.style.display =
+        "none";
     }
 }
-
 
 
 followBtn.addEventListener(
@@ -180,8 +199,6 @@ followBtn.addEventListener(
 
         if (response.ok) {
 
-            console.log(data);
-
             loadProfile();
         }
         else {
@@ -195,10 +212,28 @@ followBtn.addEventListener(
 );
 
 
-
 saveBtn.addEventListener(
     "click",
     async () => {
+
+        const formData =
+        new FormData();
+
+        formData.append(
+            "bio",
+            bioEl.value
+        );
+
+        const image =
+        profilePicture.files[0];
+
+        if (image) {
+
+            formData.append(
+                "profile_picture",
+                image
+            );
+        }
 
         const response =
         await fetch(
@@ -207,19 +242,11 @@ saveBtn.addEventListener(
                 method: "PUT",
 
                 headers: {
-
-                    "Content-Type":
-                    "application/json",
-
                     Authorization:
                     `Bearer ${accessToken}`
                 },
 
-                body: JSON.stringify({
-
-                    bio:
-                    bioEl.value
-                })
+                body: formData
             }
         );
 
@@ -227,15 +254,20 @@ saveBtn.addEventListener(
 
             messageEl.innerText =
             "Profile Updated Successfully";
+
+            loadProfile();
         }
         else {
+             const error =
+    await response.text();
+
+    console.log(error);
 
             messageEl.innerText =
             "Update Failed";
         }
     }
 );
-
 
 
 document.getElementById(
@@ -250,7 +282,6 @@ document.getElementById(
 );
 
 
-
 document.getElementById(
     "logoutBtn"
 ).addEventListener(
@@ -263,7 +294,5 @@ document.getElementById(
         "login.html";
     }
 );
-
-
 
 loadProfile();
