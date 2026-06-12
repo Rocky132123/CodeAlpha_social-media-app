@@ -197,12 +197,8 @@ console.table(posts);
 </p>
 <p>${post.content}</p>
 
-${post.image ? `
-<img
-    src="${post.image}"
-    class="post-image"
->
-` : ""}
+${post.image ? `<img src="${post.image.startsWith("http") ? post.image : API_BASE_URL.replace("/api","") + post.image}" class="post-image">` : ""}
+
 <p class="likes-count">
     ❤️ ${post.likes_count || 0} Likes
 </p>
@@ -241,7 +237,54 @@ ${post.image ? `
     }
 }
 
+createPostBtn.addEventListener("click", async () => {
 
+    const content = document.getElementById("postContent").value.trim();
+    const image = document.getElementById("postImage").files[0];
+
+    // ✅ Stop if content is empty
+    if (!content) {
+        alert("Please write something before posting.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("content", content);
+
+    if (image) {
+        formData.append("image", image);
+    }
+
+    const btn = document.getElementById("createPostBtn");
+    btn.disabled = true;
+    btn.textContent = "Posting...";
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/posts/create/`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            },
+            body: formData
+        });
+
+        if (response.ok) {
+            document.getElementById("postContent").value = "";
+            document.getElementById("postImage").value = "";
+            loadPosts();
+        } else {
+            const data = await response.json();
+            alert(data.detail || "Failed to create post.");
+        }
+
+    } catch (error) {
+        alert("Server error. Please try again.");
+
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Create Post";
+    }
+});
 
 createPostBtn.addEventListener(
     "click",
