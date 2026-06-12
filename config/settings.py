@@ -1,20 +1,19 @@
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ─── Core ─────────────────────────────────────────────────────────────────────
 SECRET_KEY = config("SECRET_KEY")
-DEBUG = config("DEBUG", default=False, cast=bool)  # safe default
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = [
-    "aloe-app.onrender.com",
     "localhost",
     "127.0.0.1",
+    ".onrender.com",        # covers any render subdomain
 ]
 
-# ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -27,20 +26,19 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist",  # ✅ ADDED — required for BLACKLIST_AFTER_ROTATION
+    "rest_framework_simplejwt.token_blacklist",
 
-    # Local apps
+    # Your apps
     "users",
     "posts",
     "comments",
     "notifications",
 ]
 
-# ─── Middleware ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",           # ✅ 1st — must be absolute first
-    "django.middleware.security.SecurityMiddleware",   # ✅ 2nd
-    "whitenoise.middleware.WhiteNoiseMiddleware",       # ✅ 3rd — right after Security
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -49,11 +47,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# ─── URLs / WSGI ──────────────────────────────────────────────────────────────
 ROOT_URLCONF = "config.urls"
-WSGI_APPLICATION = "config.wsgi.application"
 
-# ─── Templates ────────────────────────────────────────────────────────────────
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -69,20 +64,15 @@ TEMPLATES = [
     },
 ]
 
-# ─── Database ─────────────────────────────────────────────────────────────────
-DATABASES = {
-    "default": {
-        "ENGINE":   "django.db.backends.postgresql",
-        "NAME":     config("DB_NAME"),
-        "USER":     config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST":     config("DB_HOST"),
-        "PORT":     config("DB_PORT", default="5432"),
-    }
-}
+WSGI_APPLICATION = "config.wsgi.application"
 
-# ─── Auth ─────────────────────────────────────────────────────────────────────
-AUTH_USER_MODEL = "users.User"
+# Database — single DATABASE_URL variable, no copy-paste mistakes
+DATABASES = {
+    "default": dj_database_url.config(
+        env="DATABASE_URL",
+        conn_max_age=600,
+    )
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -91,70 +81,53 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# ─── CORS ─────────────────────────────────────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = False
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "Asia/Kolkata"
+USE_I18N = True
+USE_TZ = True
 
-CORS_ALLOWED_ORIGINS = [
-    "https://aloe-frontend.onrender.com",
-]
+# Static files
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-CORS_ALLOW_METHODS = [          # ✅ Explicit — don't rely on defaults
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-]
+# Media files
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
-CORS_ALLOW_HEADERS = [          # ✅ Explicit — 'content-type' + 'authorization' are critical
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CORS_ALLOW_CREDENTIALS = False  # JWT via Authorization header — no cookies
+AUTH_USER_MODEL = "users.User"
 
-# ─── DRF ──────────────────────────────────────────────────────────────────────
+# DRF
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
 
-# ─── JWT ──────────────────────────────────────────────────────────────────────
-SIMPLE_JWT = {                          # ✅ Single definition — duplicate removed
-    "ACCESS_TOKEN_LIFETIME":  timedelta(minutes=60),
+# JWT
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS":  True,
+    "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-# ─── Internationalisation ─────────────────────────────────────────────────────
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "Asia/Kolkata"
-USE_I18N = True
-USE_TZ = True
-
-# ─── Static / Media ───────────────────────────────────────────────────────────
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"          # ← ADD THIS
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # ← ADD THIS
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-import dj_database_url  # pip install dj-database-url
-
-DATABASES = {
-    "default": dj_database_url.config(
-        env="DATABASE_URL",
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
+# CORS
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "https://aloe-frontend.onrender.com",
+]
+CORS_ALLOW_METHODS = [
+    "DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT",
+]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "origin",
+    "x-csrftoken",
+    "x-requested-with",
+]
+CORS_ALLOW_CREDENTIALS = False
