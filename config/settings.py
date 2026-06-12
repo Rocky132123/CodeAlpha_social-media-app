@@ -1,21 +1,20 @@
 from pathlib import Path
-
 from decouple import config
-
 from datetime import timedelta
-import os
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ─── Core ─────────────────────────────────────────────────────────────────────
 SECRET_KEY = config("SECRET_KEY")
-
-DEBUG = config("DEBUG", cast=bool)
+DEBUG = config("DEBUG", default=False, cast=bool)  # safe default
 
 ALLOWED_HOSTS = [
     "aloe-app.onrender.com",
     "localhost",
-    "127.0.0.1"
+    "127.0.0.1",
 ]
 
+# ─── Apps ─────────────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -23,39 +22,43 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'users',
-    'posts',
-    "corsheaders",
-    "comments",
-    "notifications",
 
+    # Third party
+    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",  # ✅ ADDED — required for BLACKLIST_AFTER_ROTATION
+
+    # Local apps
+    "users",
+    "posts",
+    "comments",
+    "notifications",
 ]
 
+# ─── Middleware ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
+    "corsheaders.middleware.CorsMiddleware",           # ✅ 1st — must be absolute first
+    "django.middleware.security.SecurityMiddleware",   # ✅ 2nd
+    "whitenoise.middleware.WhiteNoiseMiddleware",       # ✅ 3rd — right after Security
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.middleware.security.SecurityMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# ─── URLs / WSGI ──────────────────────────────────────────────────────────────
 ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
 
+# ─── Templates ────────────────────────────────────────────────────────────────
 TEMPLATES = [
     {
-        "BACKEND":
-        "django.template.backends.django.DjangoTemplates",
-
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
-
         "APP_DIRS": True,
-
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
@@ -66,93 +69,83 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
-
+# ─── Database ─────────────────────────────────────────────────────────────────
 DATABASES = {
     "default": {
-        "ENGINE":
-        "django.db.backends.postgresql",
-
-        "NAME":
-        config("DB_NAME"),
-
-        "USER":
-        config("DB_USER"),
-
-        "PASSWORD":
-        config("DB_PASSWORD"),
-
-        "HOST":
-        config("DB_HOST"),
-
-        "PORT":
-        config("DB_PORT"),
+        "ENGINE":   "django.db.backends.postgresql",
+        "NAME":     config("DB_NAME"),
+        "USER":     config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST":     config("DB_HOST"),
+        "PORT":     config("DB_PORT", default="5432"),
     }
 }
 
+# ─── Auth ─────────────────────────────────────────────────────────────────────
+AUTH_USER_MODEL = "users.User"
+
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME":
-        "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME":
-        "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME":
-        "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME":
-        "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LANGUAGE_CODE = "en-us"
+# ─── CORS ─────────────────────────────────────────────────────────────────────
+CORS_ALLOW_ALL_ORIGINS = False
 
-TIME_ZONE = "Asia/Kolkata"
-
-USE_I18N = True
-
-USE_TZ = True
-
-STATIC_URL = "static/"
-
-MEDIA_URL = "/media/"
-
-MEDIA_ROOT = BASE_DIR / "media"
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
-}
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME":
-    timedelta(minutes=60),
-
-    "REFRESH_TOKEN_LIFETIME":
-    timedelta(days=7),
-
-    "ROTATE_REFRESH_TOKENS":
-    True,
-
-    "BLACKLIST_AFTER_ROTATION":
-    True,
-}
-AUTH_USER_MODEL = "users.User"
 CORS_ALLOWED_ORIGINS = [
     "https://aloe-frontend.onrender.com",
 ]
-CORS_ALLOW_ALL_ORIGINS = True
-print("CORS LOADED")
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+
+CORS_ALLOW_METHODS = [          # ✅ Explicit — don't rely on defaults
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [          # ✅ Explicit — 'content-type' + 'authorization' are critical
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_ALLOW_CREDENTIALS = False  # JWT via Authorization header — no cookies
+
+# ─── DRF ──────────────────────────────────────────────────────────────────────
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+# ─── JWT ──────────────────────────────────────────────────────────────────────
+SIMPLE_JWT = {                          # ✅ Single definition — duplicate removed
+    "ACCESS_TOKEN_LIFETIME":  timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True,
+    "ROTATE_REFRESH_TOKENS":  True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
+
+# ─── Internationalisation ─────────────────────────────────────────────────────
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "Asia/Kolkata"
+USE_I18N = True
+USE_TZ = True
+
+# ─── Static / Media ───────────────────────────────────────────────────────────
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"          # ← ADD THIS
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # ← ADD THIS
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
