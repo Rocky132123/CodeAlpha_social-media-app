@@ -1,7 +1,9 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 
+
 class Command(BaseCommand):
+    help = "Creates a superuser automatically"
 
     def handle(self, *args, **kwargs):
         User = get_user_model()
@@ -13,8 +15,8 @@ class Command(BaseCommand):
             User.objects.create_superuser(
                 username=username,
                 email=email,
-                password=password
+                password=password,
             )
             self.stdout.write("Superuser created successfully")
         else:
-            self.stdout.write("Superuser already exists")
+            self.stdout.write("Superuser already exists — skipping")
